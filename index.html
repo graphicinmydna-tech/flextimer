@@ -1,0 +1,330 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>FlexTimer</title>
+<link rel="manifest" href="manifest.json">
+
+<style>
+  :root{
+    --bg:#0f1115;
+    --card:#181b22;
+    --accent:#5eead4;
+    --text:#f4f4f5;
+    --sub:#8b8f9a;
+    --danger:#f87171;
+  }
+
+  *{box-sizing:border-box;margin:0;padding:0;}
+
+  html,body{
+    width:100%;
+    min-height:100%;
+    background:var(--bg);
+  }
+
+  body{
+    color:var(--text);
+    font-family:'Space Grotesk',sans-serif;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+    overflow:hidden;
+  }
+
+  .app{
+    width:100%;
+    min-height:100svh;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    padding:5svh 6vw;
+  }
+
+  h1{
+    position:absolute;
+    top:3.2svh;
+    left:0;
+    right:0;
+    text-align:center;
+    font-family:'Archivo',sans-serif;
+    font-size:13px;
+    font-weight:700;
+    color:var(--sub);
+    letter-spacing:.18em;
+    text-transform:uppercase;
+  }
+
+  .card{
+    width:100%;
+    height:80svh;
+    min-height:480px;
+    max-width:900px;
+    background:var(--card);
+    border-radius:32px;
+    padding:clamp(24px,5vw,56px);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    box-shadow:0 18px 60px rgba(0,0,0,.38);
+  }
+
+  #display{
+    width:100%;
+    font-family:'Archivo',sans-serif;
+    font-size:clamp(72px,18vw,190px);
+    font-weight:800;
+    line-height:.92;
+    letter-spacing:-.055em;
+    white-space:nowrap;
+    margin:0 0 clamp(34px,7vh,64px);
+    font-variant-numeric:tabular-nums;
+  }
+
+  .input-row{
+    display:flex;
+    gap:clamp(8px,2vw,18px);
+    justify-content:center;
+    width:100%;
+  }
+
+  .input-row > div{
+    flex:0 1 130px;
+  }
+
+  .input-row input{
+    width:100%;
+    background:#22262f;
+    border:1px solid #2d323d;
+    border-radius:16px;
+    color:var(--text);
+    font-family:'Space Grotesk',sans-serif;
+    font-size:clamp(18px,4vw,28px);
+    font-weight:600;
+    text-align:center;
+    padding:15px 6px;
+    outline:none;
+  }
+
+  .input-row input:focus{
+    border-color:var(--accent);
+    box-shadow:0 0 0 3px rgba(94,234,212,.12);
+  }
+
+  .input-row label{
+    display:block;
+    font-size:11px;
+    font-weight:600;
+    color:var(--sub);
+    margin-top:7px;
+    text-transform:uppercase;
+    letter-spacing:.1em;
+  }
+
+  .controls{
+    display:flex;
+    gap:12px;
+    justify-content:center;
+    width:100%;
+    max-width:520px;
+    margin-top:clamp(28px,6vh,52px);
+  }
+
+  .btn{
+    border:none;
+    border-radius:16px;
+    padding:15px 20px;
+    font-family:'Space Grotesk',sans-serif;
+    font-size:15px;
+    font-weight:700;
+    cursor:pointer;
+    flex:1;
+    min-height:52px;
+  }
+
+  .btn-start{background:var(--accent);color:#08201c;}
+  .btn-pause{background:#3b3f4a;color:var(--text);}
+  .btn-reset{background:transparent;color:var(--danger);border:1px solid var(--danger);}
+
+  #status{
+    margin-top:18px;
+    font-size:11px;
+    color:var(--sub);
+  }
+
+  .presets,.section-title,.fonts,.install-note{
+    display:none;
+  }
+
+  @media (max-width:520px){
+    .card{
+      width:100%;
+      height:80svh;
+      min-height:0;
+      border-radius:26px;
+      padding:28px 16px;
+    }
+
+    #display{
+      font-size:clamp(58px,19vw,110px);
+      margin-bottom:8svh;
+    }
+
+    .input-row > div{
+      min-width:0;
+    }
+
+    .input-row input{
+      border-radius:13px;
+      padding:13px 2px;
+    }
+
+    .controls{
+      margin-top:7svh;
+    }
+
+    .btn{
+      padding:13px 10px;
+      min-height:48px;
+      font-size:14px;
+    }
+  }
+
+  @media (max-height:650px){
+    .card{height:84svh;}
+    #display{margin-bottom:4vh;}
+    .controls{margin-top:4vh;}
+  }
+</style>
+
+</head>
+<body>
+<div class="app">
+  <h1>FlexTimer</h1>
+
+  <div class="card">
+    <div id="display" class="font-grotesque">00:00</div>
+
+    <div class="input-row">
+      <div><input id="hh" type="number" min="0" max="23" value="0" inputmode="numeric"><label>hrs</label></div>
+      <div><input id="mm" type="number" min="0" max="59" value="5" inputmode="numeric"><label>min</label></div>
+      <div><input id="ss" type="number" min="0" max="59" value="0" inputmode="numeric"><label>sec</label></div>
+    </div>
+
+    <div class="controls">
+      <button class="btn btn-start" id="startBtn">Start</button>
+      <button class="btn btn-pause" id="pauseBtn">Pause</button>
+      <button class="btn btn-reset" id="resetBtn">Reset</button>
+    </div>
+
+    <div id="status">Notifications: not enabled</div>
+  </div>
+</div>
+
+<audio id="beep" src="data:audio/wav;base64,UklGRl9vT19XQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQ==" preload="auto"></audio>
+
+<script>
+  const display = document.getElementById('display');
+  const startBtn = document.getElementById('startBtn');
+  const pauseBtn = document.getElementById('pauseBtn');
+  const resetBtn = document.getElementById('resetBtn');
+  const status = document.getElementById('status');
+  const beep = document.getElementById('beep');
+
+  let totalSeconds = 300;
+  let remaining = totalSeconds;
+  let ticking = null;
+  let endAt = null;
+
+  function fmt(sec){
+    const h = Math.floor(sec/3600);
+    const m = Math.floor((sec%3600)/60);
+    const s = sec%60;
+    const pad = n => String(n).padStart(2,'0');
+    return h>0 ? `${pad(h)}:${pad(m)}:${pad(s)}` : `${pad(m)}:${pad(s)}`;
+  }
+
+  function render(){ display.textContent = fmt(remaining); }
+  render();
+
+  ['hh','mm','ss'].forEach(id=>{
+    document.getElementById(id).addEventListener('change', syncFromInputs);
+  });
+  function syncFromInputs(){
+    const h = parseInt(document.getElementById('hh').value)||0;
+    const m = parseInt(document.getElementById('mm').value)||0;
+    const s = parseInt(document.getElementById('ss').value)||0;
+    totalSeconds = h*3600+m*60+s;
+    remaining = totalSeconds;
+    render();
+  }
+
+  async function askNotifyPermission(){
+    if(!('Notification' in window)){
+      status.textContent = 'Notifications not supported on this browser';
+      return;
+    }
+    if(Notification.permission === 'granted'){
+      status.textContent = 'Notifications: enabled';
+      return;
+    }
+    const perm = await Notification.requestPermission();
+    status.textContent = perm === 'granted' ? 'Notifications: enabled' : 'Notifications: blocked';
+  }
+  askNotifyPermission();
+
+  function notifyDone(){
+    try{ beep.play(); }catch(e){}
+    if('Notification' in window && Notification.permission === 'granted'){
+      new Notification('FlexTimer', { body: 'Time is up!', tag: 'flextimer-done' });
+    }
+    if(navigator.vibrate) navigator.vibrate([200,100,200]);
+  }
+
+  startBtn.addEventListener('click', ()=>{
+    if(ticking) return;
+    if(remaining<=0) remaining = totalSeconds;
+    askNotifyPermission();
+    endAt = Date.now() + remaining * 1000;
+    ticking = setInterval(()=>{
+      remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+      render();
+      if(remaining<=0){
+        clearInterval(ticking);
+        ticking = null;
+        endAt = null;
+        notifyDone();
+      }
+    },250);
+  });
+
+  pauseBtn.addEventListener('click', ()=>{
+    if(ticking){
+      remaining = Math.max(0, Math.ceil((endAt - Date.now()) / 1000));
+      clearInterval(ticking);
+      ticking = null;
+      endAt = null;
+      render();
+    }
+  });
+
+  resetBtn.addEventListener('click', ()=>{
+    if(ticking){ clearInterval(ticking); ticking=null; }
+    remaining = totalSeconds;
+    render();
+  });
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('sw.js').catch(()=>{});
+  }
+</script>
+</body>
+</html>
